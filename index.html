@@ -674,7 +674,14 @@ try { state = JSON.parse(localStorage.getItem(KEY)); } catch(e) { state = null; 
 // МИГРАЦИЯ: если есть старые данные с 3 наградами — добавляем 2 пустые
 if (state && Array.isArray(state.goals)) {
     state.goals.forEach(g => {
-    if (!g.icon) g.icon = '✨';
+        if (!g.icon || g.icon === '✨') {
+      const n = (g.name || '').toLowerCase();
+      if (n.includes('похуд')) g.icon = '⚖️';
+      else if (n.includes('заряд')) g.icon = '🌅';
+      else if (n.includes('трениров')) g.icon = '💪';
+      else if (n.includes('белок')) g.icon = '🥩';
+      else if (n.includes('ккал')) g.icon = '🍽️';
+    }
     if (!g.rewardsPage) g.rewardsPage = 0;
     if (g.rewards && g.rewards.length === 3) {
       g.rewards.push({ icon: '🎁', name: 'Награда 4' });
