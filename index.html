@@ -60,7 +60,6 @@
     text-shadow: 0 1px 6px rgba(255,255,255,0.9);
   }
 
-  /* Стили для сворачиваемого заголовка */
   .toggle-header {
     cursor: pointer;
     user-select: none;
@@ -123,6 +122,37 @@
 
   .progress-text { font-size: 0.9em; color: var(--text-secondary); text-align: right; font-weight: 500; margin-bottom: 16px; }
 
+  .motivation-box {
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.4s ease-out;
+  }
+  .motivation-box .m-emoji {
+    font-size: 1.8em;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .motivation-box .m-text {
+    font-size: 0.88em;
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .motivation-box .m-text .highlight {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .motivation-box.done {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-color: var(--gold);
+  }
+
   label { font-size: 0.85em; color: var(--text-secondary); display: block; margin-top: 16px; margin-bottom: 6px; font-weight: 600; }
 
   input, select {
@@ -165,7 +195,24 @@
   .reward-inputs input { font-size: 14px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: white; }
   .reward-inputs .img-input { font-size: 12px; color: var(--text-secondary); }
 
-  .rewards { display: flex; gap: 10px; margin-top: 20px; }
+  /* ПАГИНАЦИЯ НАГРАД */
+  .rewards-wrapper {
+    position: relative;
+    margin-top: 20px;
+    overflow: hidden;
+  }
+
+  .rewards-track {
+    display: flex;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .rewards-page {
+    min-width: 100%;
+    display: flex;
+    gap: 10px;
+    padding: 0 2px;
+  }
 
   .reward-slot {
     flex: 1; text-align: center; border-radius: 16px; padding: 16px 6px 12px;
@@ -221,6 +268,41 @@
     background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: 99px; white-space: nowrap; margin-bottom: 6px;
   }
   .reward-slot.unlocked .reward-stage { background: rgba(245,158,11,0.15); color: #b45309; font-weight: 700; }
+
+  /* Навигация между страницами наград */
+  .rewards-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding: 0 4px;
+  }
+
+  .nav-btn {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1em;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+  }
+  .nav-btn:active { transform: scale(0.9); background: var(--border-color); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .page-indicator {
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    font-weight: 600;
+    background: var(--bg-input);
+    padding: 4px 12px;
+    border-radius: 99px;
+  }
 
   .goal.done { border: 2px solid var(--gold); background: #fffbeb; }
   .frozen {
@@ -290,30 +372,48 @@
     <div class="hint">💡 Целевой вес рассчитается автоматически.</div>
   </div>
 
-  <label style="margin-top:20px">🥉 Награда 1 (треть пути)</label>
+  <label style="margin-top:20px">🎁 Награда 1 (20%)</label>
   <div class="reward-inputs">
-    <input id="r1icon" class="icon-input" placeholder="🥐" maxlength="4">
+    <input id="r1icon" class="icon-input" placeholder="🎁" maxlength="4" value="🎁">
     <div class="mid">
       <input id="r1name" class="name-input" placeholder="Название награды">
       <input id="r1img" class="img-input" placeholder="Ссылка на картинку (необязательно)">
     </div>
   </div>
 
-  <label>🥈 Награда 2 (две трети)</label>
+  <label>🎁 Награда 2 (40%)</label>
   <div class="reward-inputs">
-    <input id="r2icon" class="icon-input" placeholder="👗" maxlength="4">
+    <input id="r2icon" class="icon-input" placeholder="🎁" maxlength="4" value="🎁">
     <div class="mid">
       <input id="r2name" class="name-input" placeholder="Название награды">
       <input id="r2img" class="img-input" placeholder="Ссылка на картинку (необязательно)">
     </div>
   </div>
 
-  <label>🥇 Награда 3 (финиш)</label>
+  <label>🎁 Награда 3 (60%)</label>
   <div class="reward-inputs">
-    <input id="r3icon" class="icon-input" placeholder="🏝️" maxlength="4">
+    <input id="r3icon" class="icon-input" placeholder="🎁" maxlength="4" value="🎁">
     <div class="mid">
       <input id="r3name" class="name-input" placeholder="Название награды">
       <input id="r3img" class="img-input" placeholder="Ссылка на картинку (необязательно)">
+    </div>
+  </div>
+
+  <label>🎁 Награда 4 (80%)</label>
+  <div class="reward-inputs">
+    <input id="r4icon" class="icon-input" placeholder="🎁" maxlength="4" value="🎁">
+    <div class="mid">
+      <input id="r4name" class="name-input" placeholder="Название награды">
+      <input id="r4img" class="img-input" placeholder="Ссылка на картинку (необязательно)">
+    </div>
+  </div>
+
+  <label>🎁 Награда 5 (100%)</label>
+  <div class="reward-inputs">
+    <input id="r5icon" class="icon-input" placeholder="🎁" maxlength="4" value="🎁">
+    <div class="mid">
+      <input id="r5name" class="name-input" placeholder="Название награды">
+      <input id="r5img" class="img-input" placeholder="Ссылка на картинку (необязательно)">
     </div>
   </div>
 
@@ -344,39 +444,64 @@
 </div>
 
 <script>
-const KEY = 'goalquest_v5';
+const KEY = 'goalquest_v6';
+
+const MOTIVATION_PHRASES = [
+  { emoji: '💪', text: 'Так держать! Ты на верном пути.' },
+  { emoji: '🔥', text: 'Огонь! Каждая отметка приближает к цели.' },
+  { emoji: '⚡', text: 'Мощно! Продолжай в том же духе.' },
+  { emoji: '🚀', text: 'Ты летишь к цели! Не сбавляй обороты.' },
+  { emoji: '🌟', text: 'Отличная работа! Ты делаешь всё правильно.' },
+  { emoji: '🎯', text: 'В точку! Ещё немного — и следующая награда твоя.' },
+  { emoji: '💎', text: 'Ты бриллиант! Каждая отметка — это шаг к мечте.' },
+  { emoji: '🏋️‍♀️', text: 'Сильнее с каждым днём! Так держать.' },
+  { emoji: '🌈', text: 'После дождя всегда выходит солнце. Ты справишься!' },
+  { emoji: '✨', text: 'Магия в постоянстве. Ты творишь её каждый день.' }
+];
+
 const ZYA_IMG = 'https://i.ibb.co/bM7YvZNW/image.png';
 
+// 5 НАГРАД НА КАЖДУЮ ЦЕЛЬ
 const SEED = [
   { type: 'weight', name: 'Похудеть · 20 кг', start: 100, lose: 20, current: 100, target: 80,
     rewards: [
       { icon: '🥐', name: 'Эклер из Lavanda eclair' },
+      { icon: '📚', name: 'Книжный магазин до 500 ₽' },
+      { icon: '🧴', name: 'Крем Geltek ретинол' },
       { icon: '👗', name: 'Новое платье' },
-      { icon: '🎀', name: 'Новое нижнее бельё' }
+      { icon: '🎀', name: 'Новое бельё' }
     ]},
   { type: 'count', name: 'Зарядка · 90 дней', total: 90, unit: 'дней',
     rewards: [
       { icon: '🥞', name: 'Бранч в красивом месте' },
       { icon: '💅', name: 'Маникюр в салоне' },
-      { icon: '🖼️', name: 'Абонемент в Эрарту' }
+      { icon: '🖼️', name: 'Абонемент в Эрарту' },
+      { icon: '👟', name: 'Новая спортивная одежда' },
+      { icon: '🏃‍♀️', name: 'Мини-курс SEKTA' }
     ]},
   { type: 'count', name: 'Тренировки · 90 дней', total: 90, unit: 'дней',
     rewards: [
-      { icon: '👟', name: 'Красивая спорт-одежда' },
-      { icon: '🧖‍♀️', name: 'SPA-сеанс' },
-      { icon: '💆‍♀️', name: 'Консультация косметолога' }
+      { icon: '☕', name: 'Чашка для кофе' },
+      { icon: '📿', name: 'Украшение' },
+      { icon: '🎬', name: 'Сходить в кино' },
+      { icon: '💆‍♀️', name: 'Консультация косметолога' },
+      { icon: '💉', name: 'Биоревитализация' }
     ]},
   { type: 'count', name: 'Белок 140 г · 90 дней', total: 90, unit: 'дней',
     rewards: [
+      { icon: '🍎', name: 'ЗЯ на 500 ₽', img: ZYA_IMG },
       { icon: '🍎', name: 'ЗЯ на 1000 ₽', img: ZYA_IMG },
       { icon: '🍎', name: 'ЗЯ на 1500 ₽', img: ZYA_IMG },
-      { icon: '🍎', name: 'ЗЯ на 2000 ₽', img: ZYA_IMG }
+      { icon: '🍎', name: 'ЗЯ на 2000 ₽', img: ZYA_IMG },
+      { icon: '🍎', name: 'ЗЯ на 2500 ₽', img: ZYA_IMG }
     ]},
   { type: 'count', name: 'Суточные ккал 1800 · 90 дней', total: 90, unit: 'дней',
     rewards: [
-      { icon: '🧁', name: 'Цех85 на 1000 ₽' },
+      { icon: '🧁', name: 'Булочка со сливками' },
+      { icon: '🍜', name: 'Slurp Ramen на 1000 ₽' },
+      { icon: '🍰', name: 'Цех 85 на 1000 ₽' },
       { icon: '🍕', name: 'ДоДо Пицца на 1500 ₽' },
-      { icon: '🍣', name: 'YamiYami на 3000 ₽' }
+      { icon: '🍣', name: 'Yami Yami на 3000 ₽' }
     ]}
 ];
 
@@ -386,6 +511,7 @@ function makeSeedGoals() {
     g.id = Date.now() + idx;
     g.done = false;
     g.lastLog = null;
+    g.rewardsPage = 0; // Текущая страница наград (0 или 1)
     if (s.type === 'weight') { g.current = s.current; g.target = s.target; }
     else g.current = 0;
     return g;
@@ -395,6 +521,18 @@ function makeSeedGoals() {
 const goalsEl = document.getElementById('goals');
 let state;
 try { state = JSON.parse(localStorage.getItem(KEY)); } catch(e) { state = null; }
+
+// МИГРАЦИЯ: если есть старые данные с 3 наградами — добавляем 2 пустые
+if (state && Array.isArray(state.goals)) {
+  state.goals.forEach(g => {
+    if (!g.rewardsPage) g.rewardsPage = 0;
+    if (g.rewards && g.rewards.length === 3) {
+      g.rewards.push({ icon: '🎁', name: 'Награда 4' });
+      g.rewards.push({ icon: '🎁', name: 'Награда 5' });
+    }
+  });
+}
+
 if (!state || !Array.isArray(state.goals) || state.goals.length === 0) {
   state = { goals: makeSeedGoals(), lastBackup: new Date().toISOString() };
   localStorage.setItem(KEY, JSON.stringify(state));
@@ -422,14 +560,26 @@ function toggleNewGoal(forceState) {
   else arrow.classList.remove('rotated');
 }
 
+/* ---------- ПАГИНАЦИЯ НАГРАД ---------- */
+function changeRewardsPage(goalId, direction) {
+  const g = state.goals.find(x => x.id === goalId);
+  if (!g) return;
+  
+  const newPage = g.rewardsPage + direction;
+  if (newPage >= 0 && newPage <= 1) {
+    g.rewardsPage = newPage;
+    save();
+  }
+}
+
 /* ---------- КОНФЕТТИ ---------- */
 function checkAndCelebrate(oldFrac, newFrac, isFinal) {
-  const tiers = [1/3, 2/3, 1.0];
+  const tiers = [0.2, 0.4, 0.6, 0.8, 1.0];
   let unlockedTier = 0;
   for (let i = 0; i < tiers.length; i++) {
     if (oldFrac < tiers[i] && newFrac >= tiers[i]) unlockedTier = i + 1;
   }
-  if (unlockedTier === 3 || isFinal) {
+  if (unlockedTier === 5 || isFinal) {
     var end = Date.now() + 2500;
     (function frame() {
       confetti({ particleCount: 6, angle: 60, spread: 60, origin: { x: 0, y: 0.7 }, colors: ['#f59e0b','#10b981','#3b82f6','#fbbf24'] });
@@ -479,7 +629,7 @@ function checkBackupReminder() {
   }
 }
 
-/* ---------- БЭКАП: ЭКСПОРТ / ИМПОРТ ---------- */
+/* ---------- БЭКАП ---------- */
 function markBackup() {
   state.lastBackup = new Date().toISOString();
   localStorage.setItem(KEY, JSON.stringify(state));
@@ -527,7 +677,7 @@ function addGoal() {
   const name = document.getElementById('gName').value.trim();
   if (!name) { alert('Введите название цели'); return; }
 
-  const rewards = [1,2,3].map(n => {
+  const rewards = [1,2,3,4,5].map(n => {
     const icon = document.getElementById('r' + n + 'icon').value.trim();
     const rname = document.getElementById('r' + n + 'name').value.trim();
     const rimg = document.getElementById('r' + n + 'img').value.trim();
@@ -540,23 +690,25 @@ function addGoal() {
     const unit = document.getElementById('gUnit').value.trim();
     if (totalRaw === '' || isNaN(total) || total <= 0) { alert('Введите общее количество числом'); return; }
     if (!unit) { alert('Введите единицу (дней / шт)'); return; }
-    state.goals.push({ id: Date.now(), type: 'count', name, total, unit, current: 0, rewards, done: false, lastLog: null });
+    state.goals.push({ id: Date.now(), type: 'count', name, total, unit, current: 0, rewards, done: false, lastLog: null, rewardsPage: 0 });
   } else {
     const start = parseFloat(document.getElementById('gStart').value);
     const lose = parseFloat(document.getElementById('gLose').value);
     if (isNaN(start) || isNaN(lose) || start <= 0 || lose <= 0) { alert('Введите стартовый вес и сколько сбросить'); return; }
     if (lose >= start) { alert('Сбросить больше стартового веса нельзя'); return; }
-    state.goals.push({ id: Date.now(), type: 'weight', name, start, lose, target: start - lose, current: start, rewards, done: false, lastLog: null });
+    state.goals.push({ id: Date.now(), type: 'weight', name, start, lose, target: start - lose, current: start, rewards, done: false, lastLog: null, rewardsPage: 0 });
   }
 
   ['gName','gTotal','gUnit','gStart','gLose',
-   'r1icon','r1name','r1img','r2icon','r2name','r2img','r3icon','r3name','r3img']
+   'r1icon','r1name','r1img','r2icon','r2name','r2img','r3icon','r3name','r3img',
+   'r4icon','r4name','r4img','r5icon','r5name','r5img']
     .forEach(id => document.getElementById(id).value = '');
+  
+  ['r1icon','r2icon','r3icon','r4icon','r5icon'].forEach(id => document.getElementById(id).value = '🎁');
 
   save();
   setTimeout(() => goalsEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   
-  // Сворачиваем форму после успешного добавления
   toggleNewGoal(false);
 }
 
@@ -565,6 +717,59 @@ function getLost(g) { return g.start - g.current; }
 function progressFraction(g) {
   if (g.type === 'weight') return Math.min(1, getLost(g) / g.lose);
   return Math.min(1, g.current / g.total);
+}
+
+function getMotivation(g, frac) {
+  // Если цель выполнена
+  if (g.done) {
+    return {
+      emoji: '🏆',
+      text: 'Ты сделала это! Все награды твои. Гордись собой!',
+      done: true
+    };
+  }
+
+  // Находим ближайший незаблокированный порог (20%, 40%, 60%, 80%, 100%)
+  const tiers = [0.2, 0.4, 0.6, 0.8, 1.0];
+  let nextTier = null;
+  for (let i = 0; i < tiers.length; i++) {
+    if (frac < tiers[i] - 1e-9) {
+      nextTier = { frac: tiers[i], index: i + 1 };
+      break;
+    }
+  }
+
+  // Если все пороги пройдены, но цель ещё не помечена done
+  if (!nextTier) {
+    return {
+      emoji: '🎉',
+      text: 'Последний рывок! Отметь сегодня, чтобы получить финальную награду.',
+      done: false
+    };
+  }
+
+  // Считаем, сколько осталось
+  let remaining;
+  let unit;
+  if (g.type === 'weight') {
+    const targetWeight = g.start - (g.lose * nextTier.frac);
+    remaining = (g.current - targetWeight).toFixed(1);
+    unit = 'кг';
+  } else {
+    const targetCount = Math.ceil(g.total * nextTier.frac);
+    remaining = targetCount - g.current;
+    unit = g.unit;
+  }
+
+  // Выбираем фразу (псевдослучайно, но стабильно для каждого дня)
+  const dayIndex = new Date().getDate();
+  const phrase = MOTIVATION_PHRASES[dayIndex % MOTIVATION_PHRASES.length];
+
+  return {
+    emoji: phrase.emoji,
+    text: `${phrase.text} До следующей награды осталось <span class="highlight">${remaining} ${unit}</span>!`,
+    done: false
+  };
 }
 
 function addCount(id) {
@@ -637,7 +842,6 @@ function render() {
   goalsEl.innerHTML = state.goals.map(g => {
     const frac = progressFraction(g);
     const pct = (frac * 100).toFixed(0);
-    const third = 1/3;
 
     let progText;
     if (g.type === 'weight') {
@@ -646,8 +850,9 @@ function render() {
       progText = `<strong>${g.current}</strong> / ${g.total} ${g.unit} · ${pct}%`;
     }
 
-    const slots = g.rewards.map((r, i) => {
-      const needFrac = third * (i + 1);
+       // Рендерим ОБОИ страницы наград (иначе сдвиг трекa показывает пустоту)
+    const renderSlot = (r, rewardIndex) => {
+      const needFrac = 0.2 * (rewardIndex + 1);
       const unlocked = frac >= needFrac - 1e-9;
 
       let stageLabel;
@@ -668,7 +873,21 @@ function render() {
         ${visual}
         <div class="reward-name">${r.name}</div>
       </div>`;
-    }).join('');
+    };
+
+    const page1Html = g.rewards.slice(0, 3).map((r, i) => renderSlot(r, i)).join('');
+    const page2Html = g.rewards.slice(3, 5).map((r, i) => renderSlot(r, i + 3)).join('');
+    const pageLabel = g.rewardsPage === 0 ? '1-3 / 5' : '4-5 / 5';
+
+
+    // Генерируем мотивационное сообщение
+    const motivation = getMotivation(g, frac);
+    const motivationHtml = `
+      <div class="motivation-box ${motivation.done ? 'done' : ''}">
+        <div class="m-emoji">${motivation.emoji}</div>
+        <div class="m-text">${motivation.text}</div>
+      </div>
+    `;
 
     let controls;
     if (g.done) {
@@ -698,9 +917,23 @@ function render() {
           <button class="danger" onclick="delGoal(${g.id})">🗑 Удалить цель</button>
         </div>
       </div>
-      <div class="xp-bar"><div class="xp-fill" style="width:${pct}%"></div></div>
+            <div class="xp-bar"><div class="xp-fill" style="width:${pct}%"></div></div>
       <div class="progress-text">${progText}</div>
-      <div class="rewards">${slots}</div>
+      ${motivationHtml}
+      
+            <div class="rewards-wrapper">
+        <div class="rewards-track" style="transform: translateX(-${g.rewardsPage * 100}%)">
+          <div class="rewards-page">${page1Html}</div>
+          <div class="rewards-page">${page2Html}</div>
+        </div>
+      </div>
+      
+      <div class="rewards-nav">
+        <button class="nav-btn" onclick="changeRewardsPage(${g.id}, -1)" ${g.rewardsPage === 0 ? 'disabled' : ''}>←</button>
+        <div class="page-indicator">${pageLabel}</div>
+        <button class="nav-btn" onclick="changeRewardsPage(${g.id}, 1)" ${g.rewardsPage === 1 ? 'disabled' : ''}>→</button>
+      </div>
+      
       <div style="margin-top:20px">${controls}</div>
     </div>`;
   }).join('');
