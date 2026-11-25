@@ -107,7 +107,6 @@
     box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.08),
                 0 2px 6px -2px rgba(15, 23, 42, 0.04);
     animation: fadeIn 0.4s ease-out;
-    overflow: hidden;
   }
   
   /* Цветная полоска слева */
@@ -1022,12 +1021,20 @@ function resetAll() {
 /* ---------- МЕНЮ ---------- */
 function toggleMenu(id) {
   const menu = document.getElementById('menu-' + id);
+  const card = menu.closest('.card');
   const shown = menu.classList.contains('show');
   closeAllMenus();
-  if (!shown) menu.classList.add('show');
+  if (!shown) {
+    menu.classList.add('show');
+    if (card) card.style.zIndex = '100';
+  }
 }
 function closeAllMenus() {
-  document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+  document.querySelectorAll('.dropdown-menu.show').forEach(m => {
+    m.classList.remove('show');
+    const c = m.closest('.card');
+    if (c) c.style.zIndex = '';
+  });
 }
 document.addEventListener('click', e => {
   if (!e.target.closest('.menu-btn') && !e.target.closest('.dropdown-menu')) closeAllMenus();
