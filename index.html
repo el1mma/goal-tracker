@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#f8fafc">
+<meta name="theme-color" content="#3b82f6">
      <link rel="manifest" href="manifest.json">
 <title>Мои цели</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -86,6 +86,89 @@
     animation: fadeIn 0.4s ease-out;
   }
 
+  .goal-card {
+    transition: all 0.3s ease;
+  }
+  
+  .goal-preview {
+    cursor: pointer;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .goal-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .goal-preview-title {
+    font-weight: 700;
+    font-size: 1.1em;
+    flex: 1;
+  }
+  
+  .goal-preview-progress {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  
+  .goal-preview-bar {
+    height: 6px;
+    background: var(--bg-input);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  
+  .goal-preview-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--success));
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    border-radius: 99px;
+  }
+  
+  .goal-details {
+    display: none;
+    padding: 0 20px 20px;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .goal-card.expanded .goal-details {
+    display: block;
+  }
+  
+  .goal-card.expanded .goal-preview {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+  }
+  
+  .expand-icon {
+    transition: transform 0.3s ease;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+  }
+  
+  .goal-card.expanded .expand-icon {
+    transform: rotate(180deg);
+  }
+  
+  .streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #92400e;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 0.8em;
+    font-weight: 700;
+    margin-left: 8px;
+  }
+     
   .goal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
   .goal-title { font-weight: 700; font-size: 1.15em; flex: 1; padding-right: 10px; }
   .cup { font-size: 1.6em; filter: drop-shadow(0 0 8px var(--gold-glow)); }
@@ -560,6 +643,22 @@ function toggleNewGoal(forceState) {
   if (newState) arrow.classList.add('rotated');
   else arrow.classList.remove('rotated');
 }
+     function toggleGoalExpand(id) {
+  const card = document.getElementById('goal-card-' + id);
+  if (!card) return;
+  
+  // Вибрация при разворачивании
+  if (navigator.vibrate) navigator.vibrate(20);
+  
+  card.classList.toggle('expanded');
+  
+  // Сохраняем состояние
+  const g = state.goals.find(x => x.id === id);
+  if (g) {
+    g.expanded = card.classList.contains('expanded');
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+}
 
 /* ---------- ПАГИНАЦИЯ НАГРАД ---------- */
 function changeRewardsPage(goalId, direction) {
@@ -777,7 +876,23 @@ function addCount(id) {
   const g = state.goals.find(x => x.id === id);
   if (g.done) return;
   if (g.lastLog === today()) { alert('Сегодня уже отмечено. Приходите завтра!'); return; }
+  
+  // Вибрация при нажатии
+  if (navigator.vibrate) navigator.vibrate(50);
+  
   const oldFrac = progressFraction(g);
+  
+  // Обновляем стрик
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  
+  if (g.lastLog === yesterdayStr) {
+    g.streak = (g.streak || 0) + 1;
+  } else {
+    g.streak = 1;
+  }
+  
   g.current += 1;
   if (g.current >= g.total) { g.current = g.total; g.done = true; }
   g.lastLog = today();
@@ -793,7 +908,23 @@ function saveWeight(id) {
   if (isNaN(v) || v <= 0) { alert('Введите текущий вес числом'); return; }
   if (g.lastLog === today()) { alert('Сегодня уже отмечено. Приходите завтра!'); return; }
   if (v >= g.current) { alert('Вес должен быть меньше предыдущего (' + g.current + ' кг)'); return; }
+  
+  // Вибрация при нажатии
+  if (navigator.vibrate) navigator.vibrate(50);
+  
   const oldFrac = progressFraction(g);
+  
+  // Обновляем стрик
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  
+  if (g.lastLog === yesterdayStr) {
+    g.streak = (g.streak || 0) + 1;
+  } else {
+    g.streak = 1;
+  }
+  
   g.current = v;
   if (g.current <= g.target) { g.current = g.target; g.done = true; }
   g.lastLog = today();
@@ -909,33 +1040,48 @@ function render() {
       ${blocked ? '<div class="hint" style="text-align:center;margin-top:8px;">Сегодня уже отмечено</div>' : ''}`;
     }
 
-    return `<div class="card goal ${g.done ? 'done' : ''}">
-      <div class="goal-header">
-        <div class="goal-title">${g.name}${g.done ? ' <span class="cup">🏆</span>' : ''}</div>
-        <button class="menu-btn" onclick="toggleMenu(${g.id})">⋮</button>
-        <div class="dropdown-menu" id="menu-${g.id}">
-          <button onclick="resetGoal(${g.id})">↺ Сбросить прогресс</button>
-          <button class="danger" onclick="delGoal(${g.id})">🗑 Удалить цель</button>
+        return `<div class="card goal-card ${g.expanded ? 'expanded' : ''} ${g.done ? 'done' : ''}" id="goal-card-${g.id}">
+      <div class="goal-preview" onclick="toggleGoalExpand(${g.id})">
+        <div class="goal-preview-header">
+          <div class="goal-preview-title">
+            ${g.name}
+            ${g.streak > 1 ? `<span class="streak-badge">🔥 ${g.streak} дн.</span>` : ''}
+            ${g.done ? '<span class="cup">🏆</span>' : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="goal-preview-progress">${pct}%</div>
+            <span class="expand-icon">▼</span>
+          </div>
+        </div>
+        <div class="goal-preview-bar">
+          <div class="goal-preview-fill" style="width:${pct}%"></div>
         </div>
       </div>
-            <div class="xp-bar"><div class="xp-fill" style="width:${pct}%"></div></div>
-      <div class="progress-text">${progText}</div>
-      ${motivationHtml}
       
-            <div class="rewards-wrapper">
-        <div class="rewards-track" style="transform: translateX(-${g.rewardsPage * 100}%)">
-          <div class="rewards-page">${page1Html}</div>
-          <div class="rewards-page">${page2Html}</div>
+      <div class="goal-details">
+        <div class="progress-text" style="margin-top:16px;">${progText}</div>
+        ${motivationHtml}
+        
+        <div class="rewards-wrapper">
+          <div class="rewards-track" style="transform: translateX(-${g.rewardsPage * 100}%)">
+            <div class="rewards-page">${page1Html}</div>
+            <div class="rewards-page">${page2Html}</div>
+          </div>
+        </div>
+        
+        <div class="rewards-nav">
+          <button class="nav-btn" onclick="event.stopPropagation(); changeRewardsPage(${g.id}, -1)" ${g.rewardsPage === 0 ? 'disabled' : ''}>←</button>
+          <div class="page-indicator">${pageLabel}</div>
+          <button class="nav-btn" onclick="event.stopPropagation(); changeRewardsPage(${g.id}, 1)" ${g.rewardsPage === 1 ? 'disabled' : ''}>→</button>
+        </div>
+        
+        <div style="margin-top:20px">${controls}</div>
+        
+        <div style="margin-top:16px;display:flex;gap:10px;">
+          <button class="btn-ghost" style="flex:1;font-size:0.85em;padding:10px;" onclick="event.stopPropagation(); resetGoal(${g.id})">↺ Сброс</button>
+          <button class="btn-ghost" style="flex:1;font-size:0.85em;padding:10px;color:var(--danger);" onclick="event.stopPropagation(); delGoal(${g.id})">🗑 Удалить</button>
         </div>
       </div>
-      
-      <div class="rewards-nav">
-        <button class="nav-btn" onclick="changeRewardsPage(${g.id}, -1)" ${g.rewardsPage === 0 ? 'disabled' : ''}>←</button>
-        <div class="page-indicator">${pageLabel}</div>
-        <button class="nav-btn" onclick="changeRewardsPage(${g.id}, 1)" ${g.rewardsPage === 1 ? 'disabled' : ''}>→</button>
-      </div>
-      
-      <div style="margin-top:20px">${controls}</div>
     </div>`;
   }).join('');
 }
