@@ -593,6 +593,17 @@ const MOTIVATION_PHRASES = [
   { emoji: '✨', text: 'Магия в постоянстве. Ты творишь её каждый день.' }
 ];
 
+// Перемешиваем фразы при каждом открытии приложения
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+const SESSION_PHRASES = shuffleArray(MOTIVATION_PHRASES);
+     
 const ZYA_IMG = 'https://i.ibb.co/bM7YvZNW/image.png';
 
 // 5 НАГРАД НА КАЖДУЮ ЦЕЛЬ
@@ -914,9 +925,9 @@ function getMotivation(g, frac) {
     unit = g.unit;
   }
 
-  // Выбираем фразу (псевдослучайно, но стабильно для каждого дня)
-  const dayIndex = new Date().getDate();
-  const phrase = MOTIVATION_PHRASES[dayIndex % MOTIVATION_PHRASES.length];
+    // Выбираем уникальную фразу для каждой цели из перемешанного списка
+  const phraseIndex = g.id % SESSION_PHRASES.length;
+  const phrase = SESSION_PHRASES[phraseIndex];
 
   return {
     emoji: phrase.emoji,
@@ -1095,8 +1106,8 @@ function render() {
 
         return `<div class="card goal-card ${g.expanded ? 'expanded' : ''} ${g.done ? 'done' : ''}" id="goal-card-${g.id}">
       <div class="goal-preview" onclick="toggleGoalExpand(${g.id})">
-        <div class="goal-preview-header">
-                    <div class="goal-preview-title">
+                <div class="goal-preview-header">
+          <div class="goal-preview-title">
             <span class="goal-icon">${g.icon || '✨'}</span>
             <span style="flex:1;overflow:hidden;text-overflow:ellipsis;">${g.name}</span>
             ${g.streak > 1 ? `<span class="streak-badge">🔥 ${g.streak}</span>` : ''}
@@ -1105,6 +1116,11 @@ function render() {
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="goal-preview-progress">${pct}%</div>
             <span class="expand-icon">▼</span>
+            <button class="menu-btn" onclick="event.stopPropagation(); toggleMenu(${g.id})" style="margin:0;padding:0 4px;">⋮</button>
+            <div class="dropdown-menu" id="menu-${g.id}">
+              <button onclick="event.stopPropagation(); resetGoal(${g.id})">↺ Сбросить прогресс</button>
+              <button class="danger" onclick="event.stopPropagation(); delGoal(${g.id})">🗑 Удалить цель</button>
+            </div>
           </div>
         </div>
         <div class="goal-preview-bar">
@@ -1131,11 +1147,7 @@ function render() {
         
         <div style="margin-top:20px">${controls}</div>
         
-        <div style="margin-top:16px;display:flex;gap:10px;">
-          <button class="btn-ghost" style="flex:1;font-size:0.85em;padding:10px;" onclick="event.stopPropagation(); resetGoal(${g.id})">↺ Сброс</button>
-          <button class="btn-ghost" style="flex:1;font-size:0.85em;padding:10px;color:var(--danger);" onclick="event.stopPropagation(); delGoal(${g.id})">🗑 Удалить</button>
-        </div>
-      </div>
+              </div>
     </div>`;
   }).join('');
 }
